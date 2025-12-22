@@ -1,0 +1,337 @@
+Tool design for fast track template 
+# 🎨 FAST TRACK DESIGN SYSTEM PROMPT TEMPLATE
+
+## Copy this prompt for every new tool project:
+
+```markdown
+# DESIGN SYSTEM & UI/UX REQUIREMENTS
+
+You are building a [TOOL NAME] for Fast Track Program - a premium €20K executive development program. 
+This tool must follow the Fast Track Design System for visual consistency across all tools.
+
+---
+
+## 🎨 VISUAL IDENTITY
+
+### Color Palette
+- **Primary Background**: `#FFFFFF` (White)
+- **Primary Text**: `#000000` (Black)
+- **Secondary/Borders**: `#E0E0E0` (Light Grey)
+- **Context Boxes**: `#F8F8F8` (Off-white)
+- **Accent Borders**: `#000000` (Black, 4px solid for emphasis)
+- **Section Headers**: Black background (`#000000`) with white text (`#FFFFFF`)
+
+**Design Philosophy**: Clean, minimal, professional. White canvas with black and grey accents only.
+
+---
+
+## 📝 TYPOGRAPHY
+
+### Font System
+1. **Headings Font**: `Plaak` (Bold)
+   - Font file: `Plaak3Trial-43-Bold.otf`
+   - Usage: All headings, section titles, numbered sections
+   - Properties: `font-weight: bold; letter-spacing: -0.01em; line-height: 1.2;`
+
+2. **Body Font**: `Riforma` (Regular)
+   - Font file: `RiformaLL-Regular.otf`
+   - Usage: All body text, inputs, buttons, descriptions
+   - Properties: `font-size: 16px; font-weight: normal;`
+
+### Typography Scale
+- **Large Headings (WHY/WHAT/HOW)**: `36px` (Plaak)
+- **Page Title**: `32px` (Plaak)
+- **Section Numbers** (e.g., [01]): `18px` (Plaak) with `padding: 10px 16px`
+- **Subheadings**: `20px` (Plaak)
+- **Body Text**: `16px` (Riforma)
+- **Small Text**: `14px` (Riforma)
+- **Button Text**: `16px` (Riforma)
+
+---
+
+## 🏗️ LAYOUT PRINCIPLES
+
+### 1. **Worksheet-Style Layout**
+- Full visibility of related sections
+- Left sidebar for context (WHY/WHAT/HOW instructions)
+- Main content area for input/interaction
+- Collaborative team meeting focus (not survey-style)
+
+### 2. **Information Architecture**
+- ✅ **DO**: Show related information together
+- ✅ **DO**: Use accordions for expandable sections (if >3 items)
+- ✅ **DO**: Progress sequentially (lock future sections until current is complete)
+- ❌ **DON'T**: Show only one input at a time (unless specifically a survey flow)
+- ❌ **DON'T**: Create visual overwhelm with too many sections visible at once
+
+### 3. **Spacing System**
+- Section padding: `24px` (p-6)
+- Element spacing: `16px` (space-y-4, gap-4)
+- Tight spacing: `8px` (gap-2)
+- Large spacing: `32px` (space-y-8)
+
+---
+
+## 🎯 UI COMPONENTS LIBRARY
+
+### Buttons
+```
+Primary Button:
+- Background: #000000
+- Text: #FFFFFF
+- Padding: 12px 24px (px-6 py-3)
+- Border: 2px solid black
+- Hover: Scale slightly or add subtle shadow
+
+Secondary Button:
+- Background: #FFFFFF
+- Text: #000000
+- Border: 2px solid #000000
+- Padding: 12px 24px
+- Hover: #F8F8F8 background
+
+Disabled Button:
+- Background: #E0E0E0
+- Text: #9CA3AF (grey)
+- Cursor: not-allowed
+- Opacity: 0.5
+```
+
+### Input Fields
+```
+Text Input / Textarea:
+- Border: 1px solid #E0E0E0
+- Padding: 12px 16px
+- Font: Riforma, 16px
+- Focus: border-color changes to #000000
+- Transition: 0.2s ease
+- Placeholder: #9CA3AF (grey-400)
+```
+
+### Section Headers
+```
+Numbered Section (e.g., [01] Value Proposition):
+- Background: #000000
+- Color: #FFFFFF
+- Padding: 10px 16px
+- Font-size: 18px
+- Font-weight: bold
+- Letter-spacing: 0.5px
+```
+
+### Context/Instruction Boxes
+```
+Left Sidebar Context:
+- Background: #F8F8F8
+- Border-left: 4px solid #000000
+- Padding: 24px
+- Fixed width: 320px (w-80)
+
+WHY/WHAT/HOW Headings:
+- Font: Plaak, 36px
+- Margin-bottom: 12px (mb-3)
+- Color: #000000
+```
+
+### Accordions
+```
+Accordion Structure:
+- Border: 2px solid #E0E0E0
+- Header: Clickable, bold Plaak font
+- Expanded state: Black border (#000000)
+- Icon: Chevron (rotate on expand)
+- Smooth transition: 0.2s ease
+```
+
+### Modals/Popups
+```
+Modal Design:
+- Background: #FFFFFF
+- No border (borderless design)
+- Shadow: subtle (shadow-2xl)
+- Animation: Slide or fade in
+- Backdrop: rgba(0,0,0,0.3)
+- Close button: Top-right, clean X icon
+```
+
+---
+
+## ✨ INTERACTION PATTERNS
+
+### 1. **Progressive Disclosure**
+- Lock sections until prerequisites are complete
+- Show completion status clearly
+- Use "Next" buttons to guide progression
+
+### 2. **Instant Feedback**
+- Show validation states immediately
+- Use subtle animations (0.2s ease transitions)
+- Highlight active/focused elements with black border
+
+### 3. **Placeholders & Hints**
+- Use varied, helpful placeholder text
+- Provide 3-5 different examples per input type
+- Make hints actionable and specific
+
+### 4. **Animations**
+```
+Standard Transition: transition: all 0.2s ease;
+Hover States: Subtle scale or background change
+Modal Entry: Slide from center, fade in backdrop
+Accordion: Smooth height transition
+```
+
+---
+
+## 📱 RESPONSIVE BEHAVIOR
+- Desktop-first design (primary use case)
+- Minimum width: 1024px recommended
+- Sidebar stacks above on mobile (<768px)
+- Maintain readability at all sizes
+
+---
+
+## ♿ ACCESSIBILITY
+- High contrast (black on white)
+- Focus states clearly visible (black border)
+- Font size minimum: 16px
+- Keyboard navigation support
+- Semantic HTML structure
+
+---
+
+## 🚀 TECHNICAL STACK
+- **Framework**: React 18 (embedded in single HTML file)
+- **Styling**: TailwindCSS CDN + Custom CSS
+- **Icons**: Lucide React (if needed)
+- **State Management**: React useState/useEffect
+- **Data Persistence**: localStorage
+- **No Backend**: Pure client-side
+
+---
+
+## 📋 DESIGN CHECKLIST
+
+Before launching, verify:
+- [ ] Plaak font loaded for all headings
+- [ ] Riforma font loaded for body text
+- [ ] WHY/WHAT/HOW headings are 36px
+- [ ] Section numbers ([01], [02]) are 18px with thick padding
+- [ ] All buttons have 2px borders
+- [ ] Input fields have #E0E0E0 borders that turn black on focus
+- [ ] Context boxes have 4px left black border
+- [ ] Accordions have smooth transitions
+- [ ] Modals are borderless with subtle shadows
+- [ ] Color palette is white/black/grey only
+- [ ] Spacing is consistent (use Tailwind spacing scale)
+- [ ] All transitions are 0.2s ease
+- [ ] Progressive disclosure is implemented (locked sections)
+- [ ] Placeholder text is varied and helpful
+- [ ] Tool works as collaborative worksheet (not survey)
+
+---
+
+## 🎯 NON-NEGOTIABLE DESIGN PRINCIPLES
+
+1. **Simplicity First**: Clean, uncluttered interface
+2. **iPhone-like Intuitiveness**: Zero learning curve
+3. **Instant Feedback**: Users know immediately if input is valid
+4. **Professional Aesthetic**: Premium feel for €20K program
+5. **Collaborative Focus**: Designed for team meetings, not solo completion
+6. **Fast Track Brand Consistency**: Recognize as Fast Track tool immediately
+
+---
+
+## 📝 EXAMPLE CSS TEMPLATE
+
+```css
+@font-face {
+    font-family: 'Plaak';
+    src: url('fonts/Plaak3Trial-43-Bold.otf') format('opentype');
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: 'Riforma';
+    src: url('fonts/RiformaLL-Regular.otf') format('opentype');
+    font-weight: normal;
+}
+
+body {
+    font-family: 'Riforma', -apple-system, sans-serif;
+    font-size: 16px;
+    color: #000000;
+    background: #FFFFFF;
+    -webkit-font-smoothing: antialiased;
+}
+
+.plaak {
+    font-family: 'Plaak', sans-serif;
+    font-weight: bold;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+}
+
+.worksheet-input {
+    border: 1px solid #E0E0E0;
+    padding: 12px 16px;
+    font-family: 'Riforma', sans-serif;
+    font-size: 16px;
+    transition: border-color 0.2s ease;
+}
+
+.worksheet-input:focus {
+    border-color: #000000;
+}
+
+.numbered-section {
+    background: #000000;
+    color: #FFFFFF;
+    padding: 10px 16px;
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+.context-box {
+    background: #F8F8F8;
+    border-left: 4px solid #000000;
+}
+
+.smooth {
+    transition: all 0.2s ease;
+}
+```
+
+---
+
+## 🎨 WHEN TO USE THIS SYSTEM
+
+Use this design system for:
+- ✅ All Fast Track digital tools
+- ✅ Workshop/sprint tools
+- ✅ Collaborative team exercises
+- ✅ Assessment/mapping tools
+- ✅ Any tool that represents Fast Track brand
+
+Maintain consistency = Professional brand identity!
+```
+
+---
+
+## 📁 FILES TO INCLUDE WITH PROMPT
+
+When starting a new project, also provide:
+1. `fonts/Plaak3Trial-43-Bold.otf`
+2. `fonts/RiformaLL-Regular.otf`
+3. `Fast Track brand guidelines CONFIDENTIAL (1).pdf` (if relevant)
+4. This design system prompt
+
+---
+
+Would you like me to:
+1. **Save this as a markdown file** in your project folder (`FAST_TRACK_DESIGN_SYSTEM.md`)?
+2. **Create a starter HTML template** with all the CSS pre-configured?
+3. **Add any additional design patterns** you'd like standardized?
+
+This prompt will ensure every tool you build with Cursor + Sonnet 4.5 maintains the exact same visual identity! 🎨✨
