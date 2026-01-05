@@ -1,0 +1,323 @@
+{
+  "name": "Know Thyself AI Insights Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "know-thyself-insights",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "auto-generate"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract and structure the form data\nconst formData = $input.item.json.body;\n\nconst structuredData = {\n  // Dream Section\n  birthdayStory: formData.birthdayStory || '',\n  whatLove: formData.whatLove || '',\n  makeHappen: formData.makeHappen || '',\n  biggestFear: formData.biggestFear || '',\n  painPoints: formData.painPoints || '',\n  idealLife: formData.idealLife || '',\n  \n  // Strengths Section\n  strengths: formData.strengths || [],\n  activities: formData.activities || [],\n  actionPlan: formData.actionPlan || '',\n  \n  // Values Section\n  values: formData.values || [],\n  \n  // Goals Section\n  goals: formData.goals || [],\n  \n  // Metadata\n  email: formData.email || 'anonymous@example.com',\n  timestamp: new Date().toISOString()\n};\n\nreturn { json: structuredData };"
+      },
+      "name": "Structure Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [470, 300]
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "operation": "create",
+        "modelId": "gpt-4",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are a world-class life coach and psychologist specializing in purpose discovery and self-actualization. Provide profound, personal insights that create 'WOW' moments of self-recognition."
+            },
+            {
+              "role": "user",
+              "content": "=Analyze this person's dream and purpose:\n\n80TH BIRTHDAY STORY:\n{{ $json.birthdayStory }}\n\nWHAT THEY LOVE:\n{{ $json.whatLove }}\n\nWHAT THEY WANT TO MAKE HAPPEN:\n{{ $json.makeHappen }}\n\nBIGGEST FEAR:\n{{ $json.biggestFear }}\n\nPAIN POINTS:\n{{ $json.painPoints }}\n\nIDEAL LIFE:\n{{ $json.idealLife }}\n\nProvide:\n\n1. **THE DEEPER PURPOSE** (2-3 sentences): The underlying purpose connecting all these elements.\n\n2. **THE HIDDEN PATTERN** (2-3 sentences): Patterns in what they love, fear, and desire.\n\n3. **THE BREAKTHROUGH INSIGHT** (2-3 sentences): One profound insight they haven't realized.\n\n4. **THE NORTH STAR** (1-2 sentences): Their ultimate impact if they stay true to this path."
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.8,
+          "maxTokens": 800
+        }
+      },
+      "name": "AI - Dream Analysis",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [690, 200],
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "operation": "create",
+        "modelId": "gpt-4",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are an expert in positive psychology and strengths-based development."
+            },
+            {
+              "role": "user",
+              "content": "=Analyze these strengths:\n\nTOP 5 STRENGTHS:\n{{ $json.strengths.join('\\n') }}\n\nTOP 5 ACTIVITIES:\n{{ $json.activities.join('\\n') }}\n\nACTION PLAN:\n{{ $json.actionPlan }}\n\nProvide:\n\n1. **THE UNIQUE STRENGTH SIGNATURE** (2-3 sentences): Their unique combination creating their \"superpower\".\n\n2. **THE UNDERUTILIZED STRENGTH** (2-3 sentences): Untapped potential in strength-activity pairings.\n\n3. **THE STRENGTH-BASED OPPORTUNITY** (2-3 sentences): A powerful way to use strengths they haven't considered."
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.8,
+          "maxTokens": 600
+        }
+      },
+      "name": "AI - Strengths Analysis",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [690, 400],
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "operation": "create",
+        "modelId": "gpt-4",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are a values clarification expert and executive coach."
+            },
+            {
+              "role": "user",
+              "content": "=Analyze these values:\n\n{{ $json.values.map((v, i) => `Value ${i+1}: ${v.value}\\nWhy: ${v.why}\\nAlignment: ${v.alignment}%`).join('\\n\\n') }}\n\nProvide:\n\n1. **THE VALUES CONFLICT** (2-3 sentences): Tensions between values and how to navigate them.\n\n2. **THE ALIGNMENT GAP** (2-3 sentences): The biggest gap and what closing it would change.\n\n3. **THE VALUES-DRIVEN DECISION FRAMEWORK** (2-3 sentences): The filter for major life decisions."
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.8,
+          "maxTokens": 600
+        }
+      },
+      "name": "AI - Values Analysis",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [690, 600],
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "operation": "create",
+        "modelId": "gpt-4",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are a strategic life planning expert."
+            },
+            {
+              "role": "user",
+              "content": "=Analyze these goals:\n\n{{ $json.goals.map((g, i) => `GOAL ${i+1}: ${g.goal}\\nWhy: ${g.why}\\nChallenges: ${g.challenges}\\nAction Plan: ${g.actionPlan}`).join('\\n\\n') }}\n\nProvide:\n\n1. **THE KEYSTONE GOAL** (2-3 sentences): Which goal makes all others easier?\n\n2. **THE HIDDEN OBSTACLE** (2-3 sentences): The deeper obstacle to address first.\n\n3. **THE 80/20 LEVER** (2-3 sentences): The 20% effort yielding 80% results."
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.8,
+          "maxTokens": 600
+        }
+      },
+      "name": "AI - Growth Analysis",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [690, 800],
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "operation": "create",
+        "modelId": "gpt-4",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are a master synthesist and transformational coach."
+            },
+            {
+              "role": "user",
+              "content": "=Synthesize all insights:\n\nDREAM INSIGHTS:\n{{ $('AI - Dream Analysis').item.json.choices[0].message.content }}\n\nSTRENGTHS INSIGHTS:\n{{ $('AI - Strengths Analysis').item.json.choices[0].message.content }}\n\nVALUES INSIGHTS:\n{{ $('AI - Values Analysis').item.json.choices[0].message.content }}\n\nGROWTH INSIGHTS:\n{{ $('AI - Growth Analysis').item.json.choices[0].message.content }}\n\nProvide:\n\n1. **THE GOLDEN THREAD** (3-4 sentences): The unifying theme across all areas.\n\n2. **THE TRANSFORMATION MOMENT** (2-3 sentences): The most important shift needed now.\n\n3. **THE 90-DAY CHALLENGE** (2-3 sentences): The ONE focus for maximum breakthrough.\n\n4. **THE LEGACY STATEMENT** (1-2 sentences): Complete: \"At your core, you are someone who...\""
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.9,
+          "maxTokens": 800
+        }
+      },
+      "name": "AI - Integration",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [910, 400],
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format all insights into structured JSON\n\nfunction extractSection(text, header) {\n  const pattern = new RegExp(`\\\\*\\\\*${header}\\\\*\\\\*[:\\\\s]*(.+?)(?=\\\\n\\\\n|\\\\*\\\\*|$)`, 's');\n  const match = text.match(pattern);\n  return match ? match[1].trim() : '';\n}\n\nconst dreamAnalysis = $('AI - Dream Analysis').item.json.choices[0].message.content;\nconst strengthsAnalysis = $('AI - Strengths Analysis').item.json.choices[0].message.content;\nconst valuesAnalysis = $('AI - Values Analysis').item.json.choices[0].message.content;\nconst growthAnalysis = $('AI - Growth Analysis').item.json.choices[0].message.content;\nconst integration = $('AI - Integration').item.json.choices[0].message.content;\n\nconst insights = {\n  email: $('Structure Data').item.json.email,\n  timestamp: $('Structure Data').item.json.timestamp,\n  \n  dreamAndPurpose: {\n    deeperPurpose: extractSection(dreamAnalysis, 'THE DEEPER PURPOSE'),\n    hiddenPattern: extractSection(dreamAnalysis, 'THE HIDDEN PATTERN'),\n    breakthroughInsight: extractSection(dreamAnalysis, 'THE BREAKTHROUGH INSIGHT'),\n    northStar: extractSection(dreamAnalysis, 'THE NORTH STAR')\n  },\n  \n  strengths: {\n    strengthSignature: extractSection(strengthsAnalysis, 'THE UNIQUE STRENGTH SIGNATURE'),\n    underutilizedStrength: extractSection(strengthsAnalysis, 'THE UNDERUTILIZED STRENGTH'),\n    strengthOpportunity: extractSection(strengthsAnalysis, 'THE STRENGTH-BASED OPPORTUNITY')\n  },\n  \n  values: {\n    valuesConflict: extractSection(valuesAnalysis, 'THE VALUES CONFLICT'),\n    alignmentGap: extractSection(valuesAnalysis, 'THE ALIGNMENT GAP'),\n    decisionFramework: extractSection(valuesAnalysis, 'THE VALUES-DRIVEN DECISION FRAMEWORK')\n  },\n  \n  growth: {\n    keystoneGoal: extractSection(growthAnalysis, 'THE KEYSTONE GOAL'),\n    hiddenObstacle: extractSection(growthAnalysis, 'THE HIDDEN OBSTACLE'),\n    eightyTwentyLever: extractSection(growthAnalysis, 'THE 80/20 LEVER')\n  },\n  \n  integration: {\n    goldenThread: extractSection(integration, 'THE GOLDEN THREAD'),\n    transformationMoment: extractSection(integration, 'THE TRANSFORMATION MOMENT'),\n    ninetyDayChallenge: extractSection(integration, 'THE 90-DAY CHALLENGE'),\n    legacyStatement: extractSection(integration, 'THE LEGACY STATEMENT')\n  }\n};\n\nreturn { json: insights };"
+      },
+      "name": "Format Insights",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1130, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}"
+      },
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1350, 400]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Structure Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structure Data": {
+      "main": [
+        [
+          {
+            "node": "AI - Dream Analysis",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI - Strengths Analysis",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI - Values Analysis",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI - Growth Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI - Dream Analysis": {
+      "main": [
+        [
+          {
+            "node": "AI - Integration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI - Strengths Analysis": {
+      "main": [
+        [
+          {
+            "node": "AI - Integration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI - Values Analysis": {
+      "main": [
+        [
+          {
+            "node": "AI - Integration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI - Growth Analysis": {
+      "main": [
+        [
+          {
+            "node": "AI - Integration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI - Integration": {
+      "main": [
+        [
+          {
+            "node": "Format Insights",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Insights": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {},
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2024-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+
