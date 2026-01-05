@@ -1,0 +1,1755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Know Thyself | Fast Track Tool</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @font-face {
+            font-family: 'Plaak';
+            src: url('Plaak3Trial-43-Bold.otf') format('opentype');
+            font-weight: bold;
+        }
+        @font-face {
+            font-family: 'Riforma';
+            src: url('RiformaLL-Regular.otf') format('opentype');
+            font-weight: normal;
+        }
+        @font-face {
+            font-family: 'Monument';
+            src: url('MonumentGrotesk-Mono.otf') format('opentype');
+            font-weight: normal;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Riforma', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 16px;
+            color: #000000;
+            background: #FFFFFF;
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.6;
+        }
+
+        .plaak {
+            font-family: 'Plaak', sans-serif;
+            font-weight: bold;
+            letter-spacing: -0.01em;
+            line-height: 1.2;
+        }
+
+        .monument {
+            font-family: 'Monument', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .smooth {
+            transition: all 0.2s ease;
+        }
+
+        .worksheet-input {
+            border: 1px solid #E0E0E0;
+            padding: 12px 16px;
+            font-family: 'Riforma', sans-serif;
+            font-size: 16px;
+            transition: border-color 0.2s ease;
+            width: 100%;
+            background: #FFFFFF;
+        }
+
+        .worksheet-input:focus {
+            outline: none;
+            border-color: #000000;
+        }
+
+        .worksheet-input.error {
+            border-color: #FF0000;
+        }
+
+        .numbered-section {
+            background: #000000;
+            color: #FFFFFF;
+            padding: 10px 16px;
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+
+        .btn-primary {
+            background: #000000;
+            color: #FFFFFF;
+            padding: 12px 24px;
+            border: 2px solid #000000;
+            font-family: 'Riforma', sans-serif;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary:disabled {
+            background: #E0E0E0;
+            color: #9CA3AF;
+            cursor: not-allowed;
+            opacity: 0.5;
+            border-color: #E0E0E0;
+        }
+
+        .btn-secondary {
+            background: #FFFFFF;
+            color: #000000;
+            padding: 12px 24px;
+            border: 2px solid #000000;
+            font-family: 'Riforma', sans-serif;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #F8F8F8;
+        }
+
+        .help-button {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #000000;
+            color: #FFFFFF;
+            border: 2px solid #000000;
+            font-size: 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 40;
+            transition: all 0.2s ease;
+        }
+
+        .help-button:hover {
+            transform: scale(1.1);
+            background: #fff469;
+            color: #000000;
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #E0E0E0;
+            transition: all 0.2s ease;
+        }
+
+        .progress-dot.active {
+            background: #000000;
+            transform: scale(1.3);
+        }
+
+        .progress-dot.completed {
+            background: #000000;
+        }
+
+        .cover-overlay {
+            background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7));
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .animate-in {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background: white;
+            }
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Configuration
+        const CONFIG = {
+            AUTOSAVE_WEBHOOK: 'YOUR_N8N_AUTOSAVE_WEBHOOK_URL',
+            SHARE_WEBHOOK: 'YOUR_N8N_SHARE_WEBHOOK_URL',
+            SUBMIT_WEBHOOK: 'https://n8n-edge.fasttrack-diagnostic.com/webhook/608b17ea-9618-4877-ae3c-85eb2e89b700',
+            EMAIL_WEBHOOK: 'YOUR_N8N_EMAIL_WEBHOOK_URL',
+            STORAGE_KEY: 'fasttrack_know_thyself_data',
+            TOOL_NAME: 'know_thyself',
+            SPRINT_NUMBER: 1
+        };
+
+        // Help Modal Component
+        function HelpModal({ isOpen, onClose, content }) {
+            if (!isOpen) return null;
+
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 fade-in">
+                    <div className="bg-white max-w-3xl p-12 border-8 border-black max-h-[80vh] overflow-y-auto">
+                        <div className="flex justify-between items-start mb-6">
+                            <h2 className="plaak text-5xl">INSTRUCTIONS</h2>
+                            <button onClick={onClose} className="text-4xl font-bold hover:text-gray-600">×</button>
+                        </div>
+                        {content}
+                        <button className="btn-primary w-full text-xl py-4 mt-8" onClick={onClose}>
+                            GOT IT
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        // Celebration Screen Component - Fast Track Style (Not Childish)
+        function CelebrationScreen({ title, progress, final, onContinue }) {
+            React.useEffect(() => {
+                // Auto-advance after 2 seconds (quick, confident)
+                const timer = setTimeout(() => {
+                    onContinue();
+                }, 2000);
+                return () => clearTimeout(timer);
+            }, [onContinue]);
+
+            return (
+                <div className="fixed inset-0 bg-black text-white flex items-center justify-center z-50 fade-in">
+                    <div className="text-center px-8">
+                        {/* Bold Statement - No cheerleading */}
+                        <h1 className="plaak text-8xl md:text-9xl mb-8 animate-in">
+                            {title}
+                        </h1>
+                        
+                        {/* Progress Metric - Data, not emotion */}
+                        <div className="max-w-2xl mx-auto mb-8 animate-in" style={{animationDelay: '0.1s'}}>
+                            <div className="h-2 bg-gray-800 mb-4">
+                                <div 
+                                    className="h-full bg-white transition-all duration-1000"
+                                    style={{width: `${progress}%`}}
+                                ></div>
+                            </div>
+                            <p className="monument text-xl tracking-wider">
+                                [{progress}% COMPLETE]
+                            </p>
+                        </div>
+
+                        {/* Next Action - Clear, not playful */}
+                        {!final && (
+                            <p className="text-xl text-gray-400 animate-in" style={{animationDelay: '0.2s'}}>
+                                Next section loading...
+                            </p>
+                        )}
+                        
+                        {final && (
+                            <div className="animate-in" style={{animationDelay: '0.2s'}}>
+                                <p className="text-3xl mb-8 font-bold">Self-knowledge locked in</p>
+                                <button 
+                                    onClick={onContinue}
+                                    className="bg-white text-black plaak text-2xl px-12 py-4 border-4 border-white hover:bg-black hover:text-white hover:border-white transition-all"
+                                >
+                                    VIEW CANVAS →
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        function KnowThyselfTool() {
+            const [step, setStep] = useState(0); // 0=cover, 0.5=intro, 1-4=sections, 999=canvas
+            const [showHelp, setShowHelp] = useState(false);
+            
+            const [formData, setFormData] = useState({
+                // User Identification
+                userName: '',
+                userEmail: '',
+                
+                // Section 1: Dream Launcher - Guiding Questions
+                whatLove: '',
+                whatGoodAt: '',
+                giveToWorld: '',
+                paidFor: '',
+                inspired: '',
+                feltBest: '',
+                likeAboutSelf: '',
+                hardships: '',
+                dream: '', // My reason to get up in the morning
+                
+                // Section 2: Strengths Amplifier
+                activities: [
+                    { activity: '', energy: '' },
+                    { activity: '', energy: '' },
+                    { activity: '', energy: '' }
+                ],
+                strengths: [
+                    { strength: '', fitPercent: '' },
+                    { strength: '', fitPercent: '' },
+                    { strength: '', fitPercent: '' }
+                ],
+                doMore: '',
+                doLess: '',
+                startTo: '',
+                
+                // Section 3: Values Compass
+                values: [
+                    { value: '', howLive: '', alignment: '' },
+                    { value: '', howLive: '', alignment: '' },
+                    { value: '', howLive: '', alignment: '' },
+                    { value: '', howLive: '', alignment: '' },
+                    { value: '', howLive: '', alignment: '' }
+                ],
+                
+                // Section 4: Personal Growth Blueprint
+                goals: [
+                    { goal: '', action: '', byWhen: '' },
+                    { goal: '', action: '', byWhen: '' },
+                    { goal: '', action: '', byWhen: '' }
+                ]
+            });
+
+            const [validationErrors, setValidationErrors] = useState({});
+            const autosaveTimer = useRef(null);
+
+            // Load saved data
+            useEffect(() => {
+                // Check for reset parameter
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('reset') === 'true') {
+                    localStorage.removeItem(CONFIG.STORAGE_KEY);
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    return;
+                }
+                
+                const saved = localStorage.getItem(CONFIG.STORAGE_KEY);
+                if (saved) {
+                    try {
+                        const parsed = JSON.parse(saved);
+                        setFormData(parsed.formData || formData);
+                        setStep(parsed.step || 0);
+                    } catch (e) {
+                        console.log('Error loading saved data:', e);
+                    }
+                }
+            }, []);
+
+            // Autosave
+            useEffect(() => {
+                if (autosaveTimer.current) {
+                    clearTimeout(autosaveTimer.current);
+                }
+                
+                autosaveTimer.current = setTimeout(() => {
+                    const dataToSave = { formData, step, timestamp: new Date().toISOString() };
+                    localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(dataToSave));
+                }, 1000);
+                
+                return () => {
+                    if (autosaveTimer.current) {
+                        clearTimeout(autosaveTimer.current);
+                    }
+                };
+            }, [formData, step]);
+
+            const updateFormData = (field, value) => {
+                setFormData(prev => ({ ...prev, [field]: value }));
+                setValidationErrors(prev => ({ ...prev, [field]: null }));
+            };
+
+            const updateArrayField = (field, index, value) => {
+                setFormData(prev => ({
+                    ...prev,
+                    [field]: prev[field].map((item, i) => i === index ? value : item)
+                }));
+            };
+
+            const updateObjectInArray = (field, index, key, value) => {
+                setFormData(prev => ({
+                    ...prev,
+                    [field]: prev[field].map((item, i) => 
+                        i === index ? { ...item, [key]: value } : item
+                    )
+                }));
+            };
+
+            // Validation
+            const validateSection = (sectionNum) => {
+                const errors = {};
+                
+                switch(sectionNum) {
+                    case 1: // Dream Launcher
+                        if (!formData.dream || formData.dream.trim().length < 20) {
+                            errors.dream = 'Your dream needs more detail (minimum 20 characters)';
+                        }
+                        break;
+                    case 2: // Strengths Amplifier
+                        // At least 3 activities required
+                        const filledActivities = formData.activities.filter(a => a.activity && a.activity.trim().length > 0);
+                        if (filledActivities.length < 3) {
+                            errors.activities = 'Enter at least 3 activities';
+                        }
+                        // At least 3 strengths required
+                        const filledStrengths = formData.strengths.filter(s => s.strength && s.strength.trim().length > 0);
+                        if (filledStrengths.length < 3) {
+                            errors.strengths = 'Enter at least 3 strengths';
+                        }
+                        break;
+                    case 3: // Values Compass
+                        const filledValues = formData.values.filter(v => v.value && v.value.trim().length > 0);
+                        if (filledValues.length < 3) {
+                            errors.values = 'Enter at least 3 core values';
+                        }
+                        break;
+                    case 4: // Growth Blueprint
+                        const filledGoals = formData.goals.filter(g => g.goal && g.goal.trim().length > 0);
+                        if (filledGoals.length < 2) {
+                            errors.goals = 'Enter at least 2 goals';
+                        }
+                        break;
+                }
+                
+                setValidationErrors(errors);
+                return Object.keys(errors).length === 0;
+            };
+
+            const canProceed = (sectionNum) => {
+                return validateSection(sectionNum);
+            };
+
+            // Help content
+            const getHelpContent = () => {
+                if (step === 1) {
+                    return (
+                        <div>
+                            <h3 className="plaak text-3xl mb-4">WHY</h3>
+                            <p className="mb-6 text-lg">Your dream is your North Star. Answer guiding questions to discover your reason to get up every morning.</p>
+                            
+                            <h3 className="plaak text-3xl mb-4">WHAT</h3>
+                            <p className="mb-6 text-lg">Reflect on what you love, what you're good at, and what the world needs from you.</p>
+                            
+                            <h3 className="plaak text-3xl mb-4">HOW</h3>
+                            <ol className="text-lg space-y-2">
+                                <li>1. Answer each guiding question honestly</li>
+                                <li>2. Let answers build on each other</li>
+                                <li>3. Synthesize into your core dream</li>
+                            </ol>
+                        </div>
+                    );
+                } else if (step === 2) {
+                    return (
+                        <div>
+                            <h3 className="plaak text-3xl mb-4">WHY</h3>
+                            <p className="mb-6 text-lg">Focus on strengths, not weaknesses. Map activities by energy to find your zone of genius.</p>
+                            
+                            <h3 className="plaak text-3xl mb-4">WHAT</h3>
+                            <p className="mb-6 text-lg">Identify activities that energize (+) or drain (-) you, then extract your core strengths.</p>
+                            
+                            <h3 className="plaak text-3xl mb-4">HOW</h3>
+                            <ol className="text-lg space-y-2">
+                                <li>1. List activities with +/- energy markers</li>
+                                <li>2. Identify strengths with role alignment percentage</li>
+                                <li>3. Decide what to do more/less/start</li>
+                            </ol>
+                        </div>
+                    );
+                } else if (step === 3) {
+                    return (
+                        <div>
+                            <h3 className="plaak text-3xl mb-4">WHY</h3>
+                            <p className="mb-6 text-lg">Values-driven decisions eliminate internal conflict. Align behavior with beliefs.</p>
+                            
+                            <h3 className="plaak text-3xl mb-4">WHAT</h3>
+                            <p className="mb-6 text-lg">Define 5 core values, how you live them daily, and measure alignment percentage.</p>
+                            
+                            <h3 className="plaak text-3xl mb-4">HOW</h3>
+                            <ol className="text-lg space-y-2">
+                                <li>1. List 5 non-negotiable values</li>
+                                <li>2. Describe how you live each daily</li>
+                                <li>3. Rate alignment percentage (0-100%)</li>
+                            </ol>
+                        </div>
+                    );
+                } else if (step === 4) {
+                    return (
+                        <div>
+                            <h3 className="plaak text-3xl mb-4">WHY</h3>
+                            <p className="mb-6 text-lg">Goals without action plans are wishes. Turn vision into execution.</p>
+                            
+                            <h3 className="plaak text-3xl mb-4">WHAT</h3>
+                            <p className="mb-6 text-lg">Set clear goals with specific actions and deadlines. No vague aspirations.</p>
+                            
+                            <h3 className="plaak text-3xl mb-4">HOW</h3>
+                            <ol className="text-lg space-y-2">
+                                <li>1. Define 2-3 specific goals</li>
+                                <li>2. Write exact actions required</li>
+                                <li>3. Set concrete deadlines</li>
+                            </ol>
+                        </div>
+                    );
+                }
+                return null;
+            };
+
+            return (
+                <div className="min-h-screen bg-white">
+                    {/* Help Button */}
+                    {step >= 1 && step <= 4 && (
+                        <button className="help-button no-print" onClick={() => setShowHelp(true)}>
+                            ?
+                        </button>
+                    )}
+
+                    {/* Help Modal */}
+                    <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} content={getHelpContent()} />
+
+                    {/* Cover Page */}
+                    {step === 0 && (
+                        <div className="relative min-h-screen flex items-center justify-center">
+                            <img 
+                                src="manki-kim-BtHjHxh-D7I-unsplash.jpg" 
+                                alt="Know Thyself" 
+                                className="absolute inset-0 w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 cover-overlay"></div>
+                            <div className="relative z-10 text-center text-white px-8">
+                                <h1 className="plaak text-9xl mb-6 animate-in">KNOW THYSELF</h1>
+                                <p className="text-3xl mb-12 animate-in" style={{animationDelay: '0.2s'}}>
+                                    The foundation of exceptional leadership
+                                </p>
+                                <button 
+                                    className="bg-white text-black plaak text-3xl px-16 py-6 border-4 border-white hover:bg-black hover:text-white transition-all duration-200 animate-in"
+                                    style={{animationDelay: '0.4s'}}
+                                    onClick={() => setStep(0.5)}
+                                >
+                                    START
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Intro Screen */}
+                    {step === 0.5 && (
+                        <div className="bg-black text-white min-h-screen p-16">
+                            <div className="max-w-5xl mx-auto">
+                                <div className="border-l-4 border-white pl-8 mb-16 animate-in">
+                                    <p className="text-2xl italic text-gray-300">
+                                        "The journey to self-discovery is the greatest adventure of all. Only by knowing who you truly are can you chart the path to who you are meant to become."
+                                    </p>
+                                    <p className="monument text-sm mt-4 text-gray-500">[FAST TRACK PHILOSOPHY]</p>
+                                </div>
+                                
+                                <h1 className="plaak text-9xl mb-16 animate-in" style={{animationDelay: '0.1s'}}>BEFORE WE START</h1>
+                                
+                                <div className="mb-12 animate-in" style={{animationDelay: '0.1s'}}>
+                                    <h2 className="plaak text-6xl mb-6">PURPOSE</h2>
+                                    <p className="text-3xl leading-relaxed">
+                                        Know yourself or fail leading others. Four sections. Complete picture. Your dream, values, strengths, growth plan.
+                                    </p>
+                                    <p className="text-2xl text-gray-400 mt-4">
+                                        Complete alone. Share with team at Guru-led meeting.
+                                    </p>
+                                </div>
+
+                                <div className="mb-12 animate-in" style={{animationDelay: '0.2s'}}>
+                                    <h2 className="plaak text-6xl mb-6" style={{color: '#fff469'}}>MISTAKES TO AVOID</h2>
+                                    <ul className="text-2xl space-y-4">
+                                        <li className="flex items-start">
+                                            <span className="text-4xl mr-4">•</span>
+                                            <span>Being vague about your dream (specificity creates energy)</span>
+                                        </li>
+                                        <li className="flex items-start">
+                                            <span className="text-4xl mr-4">•</span>
+                                            <span>Choosing trendy values instead of genuine ones</span>
+                                        </li>
+                                        <li className="flex items-start">
+                                            <span className="text-4xl mr-4">•</span>
+                                            <span>Focusing on weaknesses instead of strengths</span>
+                                        </li>
+                                        <li className="flex items-start">
+                                            <span className="text-4xl mr-4">•</span>
+                                            <span>Setting vague goals without deadlines</span>
+                                        </li>
+                                        <li className="flex items-start">
+                                            <span className="text-4xl mr-4">•</span>
+                                            <span>Rushing through without honest reflection</span>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div className="mb-16 animate-in" style={{animationDelay: '0.3s'}}>
+                                    <h2 className="plaak text-6xl mb-8">THE JOURNEY</h2>
+                                    <div className="grid grid-cols-4 gap-8 text-center">
+                                        <div className="border-2 border-white p-8">
+                                            <div className="text-9xl plaak mb-4">01</div>
+                                            <p className="text-2xl font-bold mb-2">Dream Launcher</p>
+                                            <p className="text-xl text-gray-400">80th birthday vision</p>
+                                        </div>
+                                        <div className="border-2 border-white p-8">
+                                            <div className="text-9xl plaak mb-4">02</div>
+                                            <p className="text-2xl font-bold mb-2">Strengths Amplifier</p>
+                                            <p className="text-xl text-gray-400">Map your energy</p>
+                                        </div>
+                                        <div className="border-2 border-white p-8">
+                                            <div className="text-9xl plaak mb-4">03</div>
+                                            <p className="text-2xl font-bold mb-2">Values Compass</p>
+                                            <p className="text-xl text-gray-400">Align behavior</p>
+                                        </div>
+                                        <div className="border-2 border-white p-8">
+                                            <div className="text-9xl plaak mb-4">04</div>
+                                            <p className="text-2xl font-bold mb-2">Growth Blueprint</p>
+                                            <p className="text-xl text-gray-400">Execute plan</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* User Identification */}
+                                <div className="mb-12 animate-in" style={{animationDelay: '0.4s'}}>
+                                    <h2 className="plaak text-6xl mb-8">IDENTIFY YOURSELF</h2>
+                                    <div className="space-y-6">
+                                        <div>
+                                            <label className="block text-2xl font-bold mb-3">Your Name</label>
+                                            <input
+                                                type="text"
+                                                className="w-full bg-white text-black border-2 border-white px-6 py-4 text-2xl focus:outline-none focus:border-yellow-400 transition-all"
+                                                value={formData.userName}
+                                                onChange={(e) => updateFormData('userName', e.target.value)}
+                                                placeholder="e.g., Ivan Petrovic"
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-2xl font-bold mb-3">Your Email</label>
+                                            <input
+                                                type="email"
+                                                className="w-full bg-white text-black border-2 border-white px-6 py-4 text-2xl focus:outline-none focus:border-yellow-400 transition-all"
+                                                value={formData.userEmail}
+                                                onChange={(e) => updateFormData('userEmail', e.target.value)}
+                                                placeholder="e.g., ivan@fasttrack.com"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button 
+                                    className="btn-primary w-full text-3xl py-8 plaak animate-in disabled:opacity-50 disabled:cursor-not-allowed" 
+                                    style={{animationDelay: '0.5s'}}
+                                    onClick={() => setStep(1)}
+                                    disabled={!formData.userName || !formData.userEmail}
+                                >
+                                    LET'S START →
+                                </button>
+                                {(!formData.userName || !formData.userEmail) && (
+                                    <p className="text-center text-yellow-400 mt-4 text-xl">↑ Enter your details to continue</p>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Header (for steps 1-4, not celebration screens) */}
+                    {step >= 1 && step < 5 && step !== 1.5 && step !== 2.5 && step !== 3.5 && step !== 4.5 && (
+                        <>
+                            <header className="border-b-2 border-black py-6 px-8 no-print">
+                                <h1 className="plaak text-3xl">KNOW THYSELF</h1>
+                                <p className="text-sm mt-2 text-gray-600">Individual and Company Identity Module</p>
+                            </header>
+
+                            {/* Progress Indicator */}
+                            <div className="border-b border-gray-200 py-6 px-8 no-print">
+                                <div className="flex items-center justify-between max-w-4xl">
+                                    <div className="flex items-center gap-2">
+                                        <div className={`progress-dot ${step >= 1 ? 'active' : ''} ${step > 1 ? 'completed' : ''}`}></div>
+                                        <span className={`text-sm ${step === 1 ? 'font-bold' : ''}`}>Dream</span>
+                                    </div>
+                                    <div className="flex-1 h-0.5 bg-gray-200 mx-4">
+                                        <div className={`h-full bg-black transition-all ${step > 1 ? 'w-full' : 'w-0'}`}></div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className={`progress-dot ${step >= 2 ? 'active' : ''} ${step > 2 ? 'completed' : ''}`}></div>
+                                        <span className={`text-sm ${step === 2 ? 'font-bold' : ''}`}>Values</span>
+                                    </div>
+                                    <div className="flex-1 h-0.5 bg-gray-200 mx-4">
+                                        <div className={`h-full bg-black transition-all ${step > 2 ? 'w-full' : 'w-0'}`}></div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className={`progress-dot ${step >= 3 ? 'active' : ''} ${step > 3 ? 'completed' : ''}`}></div>
+                                        <span className={`text-sm ${step === 3 ? 'font-bold' : ''}`}>Strengths</span>
+                                    </div>
+                                    <div className="flex-1 h-0.5 bg-gray-200 mx-4">
+                                        <div className={`h-full bg-black transition-all ${step > 3 ? 'w-full' : 'w-0'}`}></div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className={`progress-dot ${step >= 4 ? 'active' : ''}`}></div>
+                                        <span className={`text-sm ${step === 4 ? 'font-bold' : ''}`}>Growth</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    )}
+
+                    {/* Step 1: Dream Launcher */}
+                    {step === 1 && <Step1 
+                        formData={formData}
+                        updateFormData={updateFormData}
+                        validationErrors={validationErrors}
+                        canProceed={() => canProceed(1)}
+                        onNext={() => setStep(1.5)}
+                    />}
+
+                    {/* Celebration 1 */}
+                    {step === 1.5 && <CelebrationScreen 
+                        title="DREAM DEFINED"
+                        progress="25"
+                        onContinue={() => setStep(2)}
+                    />}
+
+                    {/* Step 2: Strengths Amplifier */}
+                    {step === 2 && <Step2 
+                        formData={formData}
+                        updateFormData={updateFormData}
+                        updateArrayField={updateArrayField}
+                        updateObjectInArray={updateObjectInArray}
+                        validationErrors={validationErrors}
+                        canProceed={() => canProceed(2)}
+                        onBack={() => setStep(1)}
+                        onNext={() => setStep(2.5)}
+                    />}
+
+                    {/* Celebration 2 */}
+                    {step === 2.5 && <CelebrationScreen 
+                        title="STRENGTHS MAPPED"
+                        progress="50"
+                        onContinue={() => setStep(3)}
+                    />}
+
+                    {/* Step 3: Values Compass */}
+                    {step === 3 && <Step3 
+                        formData={formData}
+                        updateFormData={updateFormData}
+                        updateArrayField={updateArrayField}
+                        updateObjectInArray={updateObjectInArray}
+                        validationErrors={validationErrors}
+                        canProceed={() => canProceed(3)}
+                        onBack={() => setStep(2)}
+                        onNext={() => setStep(3.5)}
+                    />}
+
+                    {/* Celebration 3 */}
+                    {step === 3.5 && <CelebrationScreen 
+                        title="VALUES ALIGNED"
+                        progress="75"
+                        onContinue={() => setStep(4)}
+                    />}
+
+                    {/* Step 4: Personal Growth Blueprint */}
+                    {step === 4 && <Step4 
+                        formData={formData}
+                        updateFormData={updateFormData}
+                        updateObjectInArray={updateObjectInArray}
+                        validationErrors={validationErrors}
+                        canProceed={() => canProceed(4)}
+                        onBack={() => setStep(3)}
+                        onNext={() => setStep(4.5)}
+                    />}
+
+                    {/* Celebration 4 */}
+                    {step === 4.5 && <CelebrationScreen 
+                        title="PLAN SET"
+                        progress="100"
+                        final={true}
+                        onContinue={() => setStep(999)}
+                    />}
+
+                    {/* Canvas View */}
+                    {step === 999 && <CanvasView 
+                        formData={formData}
+                        onBack={() => setStep(4)}
+                    />}
+                </div>
+            );
+        }
+
+        // SECTION 1: Dream Launcher
+        function Step1({ formData, updateFormData, validationErrors, canProceed, onNext }) {
+            const handleNext = () => {
+                if (canProceed()) {
+                    onNext();
+                }
+            };
+
+            return (
+                <main className="p-12 max-w-6xl mx-auto">
+                    <div className="animate-in">
+                        <div className="numbered-section">[01] DREAM LAUNCHER</div>
+                        
+                        <div className="bg-black text-white border-4 border-black p-6 mb-8">
+                            <h3 className="plaak text-3xl mb-2">YOU AT YOUR 80TH BIRTHDAY</h3>
+                            <p className="text-xl">
+                                Who is there? What do your friends and family say about you? What do you value most? What do you regret, and what do you wish you had accomplished?
+                            </p>
+                        </div>
+
+                        <div className="space-y-6">
+                            {/* Guiding Questions */}
+                            <div className="bg-gray-50 border-2 border-black p-6">
+                                <h3 className="plaak text-2xl mb-4">GUIDING QUESTIONS</h3>
+                                
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block font-bold mb-2">What do you love?</label>
+                                        <textarea
+                                            className="worksheet-input"
+                                            value={formData.whatLove}
+                                            onChange={(e) => updateFormData('whatLove', e.target.value)}
+                                            rows="2"
+                                            placeholder="What activities, people, or experiences bring you joy?"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block font-bold mb-2">What are you good at?</label>
+                                        <textarea
+                                            className="worksheet-input"
+                                            value={formData.whatGoodAt}
+                                            onChange={(e) => updateFormData('whatGoodAt', e.target.value)}
+                                            rows="2"
+                                            placeholder="What natural talents and skills do you possess?"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block font-bold mb-2">What can you give to the world?</label>
+                                        <textarea
+                                            className="worksheet-input"
+                                            value={formData.giveToWorld}
+                                            onChange={(e) => updateFormData('giveToWorld', e.target.value)}
+                                            rows="2"
+                                            placeholder="What unique value or contribution can you offer?"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block font-bold mb-2">What can you be paid for?</label>
+                                        <textarea
+                                            className="worksheet-input"
+                                            value={formData.paidFor}
+                                            onChange={(e) => updateFormData('paidFor', e.target.value)}
+                                            rows="2"
+                                            placeholder="What skills or services have economic value?"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block font-bold mb-2">WHO/WHAT are you inspired by and WHY?</label>
+                                        <textarea
+                                            className="worksheet-input"
+                                            value={formData.inspired}
+                                            onChange={(e) => updateFormData('inspired', e.target.value)}
+                                            rows="2"
+                                            placeholder="Who or what moves you? What qualities do you admire?"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block font-bold mb-2">WHEN have you felt most passionate and alive?</label>
+                                        <textarea
+                                            className="worksheet-input"
+                                            value={formData.feltBest}
+                                            onChange={(e) => updateFormData('feltBest', e.target.value)}
+                                            rows="2"
+                                            placeholder="Describe a time when you felt completely engaged and energized"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block font-bold mb-2">WHAT do you like about yourself?</label>
+                                        <textarea
+                                            className="worksheet-input"
+                                            value={formData.likeAboutSelf}
+                                            onChange={(e) => updateFormData('likeAboutSelf', e.target.value)}
+                                            rows="2"
+                                            placeholder="What personal qualities or characteristics do you value in yourself?"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block font-bold mb-2">WHAT hardships have you overcome? WHAT mistakes have you learned from?</label>
+                                        <textarea
+                                            className="worksheet-input"
+                                            value={formData.hardships}
+                                            onChange={(e) => updateFormData('hardships', e.target.value)}
+                                            rows="2"
+                                            placeholder="Reflect on challenges that shaped you and lessons learned"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Final Dream Statement */}
+                            <div className="bg-green-50 border-4 border-green-500 p-6">
+                                <h3 className="plaak text-2xl mb-4">MY REASON TO GET UP IN THE MORNING</h3>
+                                <label className="block font-bold mb-3 text-lg">(My Dream)</label>
+                                <textarea
+                                    className={`worksheet-input ${validationErrors.dream ? 'error' : ''}`}
+                                    value={formData.dream}
+                                    onChange={(e) => updateFormData('dream', e.target.value)}
+                                    placeholder="Synthesize your answers above into a clear, compelling dream that drives you every day. This is your North Star."
+                                    rows="5"
+                                />
+                                {validationErrors.dream && (
+                                    <p className="text-red-600 text-sm mt-2">{validationErrors.dream}</p>
+                                )}
+                                {formData.dream.length >= 20 && !validationErrors.dream && (
+                                    <p className="text-green-600 text-sm mt-2">✓ Clear and specific</p>
+                                )}
+                                <div className="text-sm text-gray-600 mt-1">
+                                    {formData.dream.length} characters (min 20)
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6 mt-8">
+                            <p className="font-bold mb-2 text-lg">💡 Pro Tip</p>
+                            <p className="text-lg">Let the guiding questions build on each other. Your dream should emerge naturally from your answers.</p>
+                        </div>
+
+                        <div className="flex justify-end mt-12">
+                            <button 
+                                className="btn-primary text-xl py-4 px-8"
+                                onClick={handleNext}
+                            >
+                                Next: Strengths Amplifier →
+                            </button>
+                        </div>
+                    </div>
+                </main>
+            );
+        }
+
+        // SECTION 2: Strengths Amplifier
+        function Step2({ formData, updateFormData, updateArrayField, updateObjectInArray, validationErrors, canProceed, onBack, onNext }) {
+            const handleNext = () => {
+                if (canProceed()) {
+                    onNext();
+                }
+            };
+
+            return (
+                <main className="p-12 max-w-6xl mx-auto">
+                    <div className="animate-in">
+                        <div className="numbered-section">[02] STRENGTHS AMPLIFIER</div>
+                        
+                        <div className="bg-black text-white border-4 border-black p-6 mb-8">
+                            <h3 className="plaak text-3xl mb-2">MAP YOUR ENERGY SOURCES</h3>
+                            <p className="text-xl">
+                                Identify activities that energize (+) or drain (-) you, then extract your core strengths.
+                            </p>
+                        </div>
+
+                        <div className="space-y-8">
+                            {/* Activities */}
+                            <div>
+                                <label className="block font-bold mb-4 text-xl">
+                                    My Activities <span className="text-sm font-normal text-gray-600 ml-2">(Mark with + for energizing, - for draining)</span>
+                                </label>
+                                <div className="space-y-3">
+                                    {formData.activities.map((item, i) => (
+                                        <div key={i} className="flex gap-3">
+                                            <input
+                                                type="text"
+                                                className="worksheet-input flex-1"
+                                                value={item.activity}
+                                                onChange={(e) => updateObjectInArray('activities', i, 'activity', e.target.value)}
+                                                placeholder={`Activity ${i + 1} (e.g., Strategic planning, Client meetings)`}
+                                            />
+                                            <select
+                                                className="worksheet-input w-24"
+                                                value={item.energy}
+                                                onChange={(e) => updateObjectInArray('activities', i, 'energy', e.target.value)}
+                                            >
+                                                <option value="">+/-</option>
+                                                <option value="+">+</option>
+                                                <option value="-">-</option>
+                                            </select>
+                                        </div>
+                                    ))}
+                                </div>
+                                <button 
+                                    className="btn-secondary mt-3"
+                                    onClick={() => {
+                                        const newActivities = [...formData.activities, { activity: '', energy: '' }];
+                                        updateFormData('activities', newActivities);
+                                    }}
+                                >
+                                    + Add Activity
+                                </button>
+                            </div>
+
+                            {/* Strengths */}
+                            <div>
+                                <label className="block font-bold mb-4 text-xl">
+                                    Identify your core strengths with role alignment percentage
+                                </label>
+                                <div className="text-sm text-gray-600 mb-4 p-4 bg-gray-50 border-l-4 border-black">
+                                    <strong>Role Alignment Percentage:</strong> How well does this strength align with your current role and daily activities? 
+                                    (0-100%, where 100% = perfectly aligned, 0% = not aligned at all)
+                                </div>
+                                <div className="space-y-3">
+                                    {formData.strengths.map((item, i) => (
+                                        <div key={i} className="flex gap-3">
+                                            <input
+                                                type="text"
+                                                className="worksheet-input flex-1"
+                                                value={item.strength}
+                                                onChange={(e) => updateObjectInArray('strengths', i, 'strength', e.target.value)}
+                                                placeholder={`Strength ${i + 1} (e.g., Strategic thinking, Problem solving)`}
+                                            />
+                                            <input
+                                                type="number"
+                                                className="worksheet-input w-32"
+                                                value={item.fitPercent}
+                                                onChange={(e) => updateObjectInArray('strengths', i, 'fitPercent', e.target.value)}
+                                                placeholder="Role alignment % (0-100)"
+                                                min="0"
+                                                max="100"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                                <button 
+                                    className="btn-secondary mt-3"
+                                    onClick={() => {
+                                        const newStrengths = [...formData.strengths, { strength: '', fitPercent: '' }];
+                                        updateFormData('strengths', newStrengths);
+                                    }}
+                                >
+                                    + Add Strength
+                                </button>
+                            </div>
+
+                            {/* Action Items */}
+                            <div className="bg-gray-50 border-2 border-black p-6 space-y-4">
+                                <div>
+                                    <label className="block font-bold mb-2">Do more of</label>
+                                    <textarea
+                                        className="worksheet-input"
+                                        value={formData.doMore}
+                                        onChange={(e) => updateFormData('doMore', e.target.value)}
+                                        rows="2"
+                                        placeholder="Activities to increase (based on + energizers)"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block font-bold mb-2">Do less of / Stop</label>
+                                    <textarea
+                                        className="worksheet-input"
+                                        value={formData.doLess}
+                                        onChange={(e) => updateFormData('doLess', e.target.value)}
+                                        rows="2"
+                                        placeholder="Activities to decrease or delegate (based on - drainers)"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block font-bold mb-2">Start to</label>
+                                    <textarea
+                                        className="worksheet-input"
+                                        value={formData.startTo}
+                                        onChange={(e) => updateFormData('startTo', e.target.value)}
+                                        rows="2"
+                                        placeholder="New activities to begin (leverage your strengths)"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6 mt-8">
+                            <p className="font-bold mb-2 text-lg">💡 Pro Tip</p>
+                            <p className="text-lg">Focus on strengths (+), not weaknesses (-). Do more of what energizes you.</p>
+                        </div>
+
+                        {(validationErrors.activities || validationErrors.strengths) && (
+                            <div className="mt-8 p-4 bg-red-50 border-2 border-red-500 text-red-700">
+                                {validationErrors.activities && <p className="font-bold mb-2">⚠️ {validationErrors.activities}</p>}
+                                {validationErrors.strengths && <p className="font-bold">⚠️ {validationErrors.strengths}</p>}
+                            </div>
+                        )}
+
+                        <div className="flex justify-between mt-12">
+                            <button className="btn-secondary text-lg py-3 px-6" onClick={onBack}>
+                                ← Back
+                            </button>
+                            <button 
+                                className="btn-primary text-xl py-4 px-8"
+                                onClick={handleNext}
+                            >
+                                Next: Values Compass →
+                            </button>
+                        </div>
+                    </div>
+                </main>
+            );
+        }
+
+        // Values Input Component with Examples
+        function ValuesInputWithExamples({ value, onChange, index }) {
+            const [showExamples, setShowExamples] = useState(false);
+            const commonValues = ['Integrity', 'Innovation', 'Growth', 'Balance', 'Excellence', 'Authenticity', 
+                                  'Service', 'Courage', 'Respect', 'Accountability', 'Collaboration', 'Creativity'];
+
+            return (
+                <div>
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            className="worksheet-input flex-1"
+                            value={value}
+                            onChange={(e) => onChange(e.target.value)}
+                            placeholder="e.g., Integrity, Innovation, Growth, Balance, Excellence, Authenticity, Service"
+                        />
+                        <button 
+                            type="button" 
+                            onClick={() => setShowExamples(!showExamples)}
+                            className="btn-secondary text-sm px-3 whitespace-nowrap"
+                        >
+                            {showExamples ? 'Hide' : 'See Examples'} →
+                        </button>
+                    </div>
+                    {showExamples && (
+                        <div className="mt-3 p-4 bg-gray-50 border border-gray-300">
+                            <h4 className="font-bold mb-3 text-sm">Common Core Values:</h4>
+                            <div className="flex flex-wrap gap-2">
+                                {commonValues.map(val => (
+                                    <button
+                                        key={val}
+                                        type="button"
+                                        onClick={() => {
+                                            onChange(val);
+                                            setShowExamples(false);
+                                        }}
+                                        className="px-3 py-1 bg-white border border-gray-300 hover:bg-gray-100 text-sm transition-colors"
+                                    >
+                                        {val}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // SECTION 3: Values Compass
+        function Step3({ formData, updateFormData, updateObjectInArray, validationErrors, canProceed, onBack, onNext }) {
+            const handleNext = () => {
+                if (canProceed()) {
+                    onNext();
+                }
+            };
+
+            return (
+                <main className="p-12 max-w-6xl mx-auto">
+                    <div className="animate-in">
+                        <div className="numbered-section">[03] VALUES COMPASS</div>
+                        
+                        <div className="bg-black text-white border-4 border-black p-6 mb-8">
+                            <h3 className="plaak text-3xl mb-2">ALIGN VALUES WITH BEHAVIOR</h3>
+                            <p className="text-xl">
+                                Identify 5 core values, how you live them daily, and measure alignment percentage.
+                            </p>
+                        </div>
+
+                        <div className="space-y-6">
+                            <div className="bg-gray-50 border-2 border-black p-6">
+                                <h3 className="plaak text-xl mb-4">GUIDING QUESTIONS</h3>
+                                <ul className="space-y-2 text-sm text-gray-700">
+                                    <li>• How do you spend your time?</li>
+                                    <li>• What do you most often talk to yourself about?</li>
+                                    <li>• What do you most often talk to others about?</li>
+                                    <li>• What inspires you?</li>
+                                    <li>• What goals stand out in your life and have stood the test of time?</li>
+                                </ul>
+                            </div>
+
+                            {/* Alignment Percentage Explanation */}
+                            <div className="mb-6 p-4 bg-gray-50 border-l-4 border-black">
+                                <h3 className="plaak text-xl mb-2">Understanding Alignment Percentage</h3>
+                                <p className="text-gray-700 mb-2">
+                                    For each value, rate how well you're currently living it in your daily life:
+                                </p>
+                                <ul className="list-disc list-inside mt-2 text-gray-700 space-y-1">
+                                    <li><strong>100%</strong> = Fully living this value in everything you do</li>
+                                    <li><strong>50%</strong> = Living it sometimes, but inconsistently</li>
+                                    <li><strong>0%</strong> = Not living this value at all</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <label className="block font-bold mb-4 text-xl">
+                                    My Core 5 Personal Values
+                                </label>
+                                <div className="space-y-4">
+                                    {formData.values.map((item, i) => (
+                                        <div key={i} className="border-2 border-gray-200 p-4 bg-white">
+                                            <div className="grid grid-cols-12 gap-4">
+                                                <div className="col-span-3">
+                                                    <label className="block text-sm font-bold mb-2">Value {i + 1}</label>
+                                                    <ValuesInputWithExamples 
+                                                        value={item.value}
+                                                        onChange={(val) => updateObjectInArray('values', i, 'value', val)}
+                                                        index={i}
+                                                    />
+                                                </div>
+                                                <div className="col-span-6">
+                                                    <label className="block text-sm font-bold mb-2">How do I live by them daily</label>
+                                                    <textarea
+                                                        className="worksheet-input"
+                                                        value={item.howLive}
+                                                        onChange={(e) => updateObjectInArray('values', i, 'howLive', e.target.value)}
+                                                        placeholder="Describe specific daily behaviors"
+                                                        rows="2"
+                                                    />
+                                                </div>
+                                                <div className="col-span-3">
+                                                    <label className="block text-sm font-bold mb-2">How well are you living this value? (0-100%)</label>
+                                                    <input
+                                                        type="number"
+                                                        className="worksheet-input"
+                                                        value={item.alignment}
+                                                        onChange={(e) => updateObjectInArray('values', i, 'alignment', e.target.value)}
+                                                        placeholder="%"
+                                                        min="0"
+                                                        max="100"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6 mt-8">
+                            <p className="font-bold mb-2 text-lg">💡 Pro Tip</p>
+                            <p className="text-lg">Be brutally honest. Gaps between values and behavior show where to focus growth.</p>
+                        </div>
+
+                        {validationErrors.values && (
+                            <div className="mt-8 p-4 bg-red-50 border-2 border-red-500 text-red-700">
+                                <p className="font-bold">⚠️ {validationErrors.values}</p>
+                            </div>
+                        )}
+
+                        <div className="flex justify-between mt-12">
+                            <button className="btn-secondary text-lg py-3 px-6" onClick={onBack}>
+                                ← Back
+                            </button>
+                            <button 
+                                className="btn-primary text-xl py-4 px-8"
+                                onClick={handleNext}
+                            >
+                                Next: Growth Blueprint →
+                            </button>
+                        </div>
+                    </div>
+                </main>
+            );
+        }
+
+        // SECTION 4: Personal Growth Blueprint
+        function Step4({ formData, updateFormData, updateObjectInArray, validationErrors, canProceed, onBack, onNext }) {
+            const handleNext = () => {
+                if (canProceed()) {
+                    onNext();
+                }
+            };
+
+            return (
+                <main className="p-12 max-w-6xl mx-auto">
+                    <div className="animate-in">
+                        <div className="numbered-section">[04] PERSONAL GROWTH BLUEPRINT</div>
+                        
+                        <div className="bg-black text-white border-4 border-black p-6 mb-8">
+                            <h3 className="plaak text-3xl mb-2">YOUR EXECUTION PLAN</h3>
+                            <p className="text-xl">
+                                Set specific goals with clear actions and deadlines. No vague aspirations.
+                            </p>
+                        </div>
+
+                        <div className="space-y-6">
+                            <div className="bg-gray-50 border-2 border-black p-6">
+                                <h3 className="plaak text-xl mb-4">GUIDING QUESTIONS</h3>
+                                <ul className="space-y-2 text-sm text-gray-700">
+                                    <li>• How do you see yourself in the next 10 years? Next 3 years?</li>
+                                    <li>• What would it TAKE to become the best version of yourself in the next 1 year?</li>
+                                    <li>• What do you have to cut off? What is the price you are willing to pay?</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <label className="block font-bold mb-4 text-xl">
+                                    Your Plan
+                                </label>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full border-2 border-black">
+                                        <thead>
+                                            <tr className="bg-black text-white">
+                                                <th className="p-3 text-left border-r-2 border-white">Goals</th>
+                                                <th className="p-3 text-left border-r-2 border-white">Action (how will you achieve the goal)</th>
+                                                <th className="p-3 text-left">By when</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {formData.goals.map((goal, i) => (
+                                                <tr key={i} className="border-t-2 border-black">
+                                                    <td className="p-3 border-r-2 border-black align-top">
+                                                        <textarea
+                                                            className="worksheet-input"
+                                                            value={goal.goal}
+                                                            onChange={(e) => updateObjectInArray('goals', i, 'goal', e.target.value)}
+                                                            placeholder="e.g., Improve leadership presence"
+                                                            rows="3"
+                                                        />
+                                                    </td>
+                                                    <td className="p-3 border-r-2 border-black align-top">
+                                                        <textarea
+                                                            className="worksheet-input"
+                                                            value={goal.action}
+                                                            onChange={(e) => updateObjectInArray('goals', i, 'action', e.target.value)}
+                                                            placeholder="e.g., Join Toastmasters, practice weekly presentations"
+                                                            rows="3"
+                                                        />
+                                                    </td>
+                                                    <td className="p-3 align-top">
+                                                        <input
+                                                            type="date"
+                                                            className="worksheet-input"
+                                                            value={goal.byWhen}
+                                                            onChange={(e) => updateObjectInArray('goals', i, 'byWhen', e.target.value)}
+                                                            min={new Date().toISOString().split('T')[0]}
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            {validationErrors.goals && (
+                                <div className="mt-4 p-4 bg-red-50 border-2 border-red-500 text-red-700">
+                                    <p className="font-bold">⚠️ {validationErrors.goals}</p>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6 mt-8">
+                            <p className="font-bold mb-2 text-lg">💡 Pro Tip</p>
+                            <p className="text-lg">Specific beats vague. "Hire COO by March 1" beats "Improve delegation."</p>
+                        </div>
+
+                        <div className="flex justify-between mt-12">
+                            <button className="btn-secondary text-lg py-3 px-6" onClick={onBack}>
+                                ← Back
+                            </button>
+                            <button 
+                                className="btn-primary text-xl py-4 px-8"
+                                onClick={handleNext}
+                            >
+                                View Your Canvas →
+                            </button>
+                        </div>
+                        
+                        {validationErrors.goals && (
+                            <div className="mt-4 p-4 bg-red-50 border-2 border-red-500 text-red-700 text-center">
+                                <p className="font-bold text-lg">↑ Complete at least 2 goals to continue</p>
+                            </div>
+                        )}
+                    </div>
+                </main>
+            );
+        }
+
+        // Canvas View Component
+        function CanvasView({ formData, onBack }) {
+            const [currentSection, setCurrentSection] = useState(null); // null = showing all sections
+
+            const handleShare = () => {
+                alert('SHARED WITH TEAM\n\nYour insights are now visible to your team. Bring this to your Guru-led meeting.');
+            };
+
+            const handleSendEmail = async (e) => {
+                try {
+                    const emailBtn = e.target;
+                    emailBtn.disabled = true;
+                    emailBtn.textContent = 'Sending...';
+
+                    const emailData = {
+                        toolName: 'know_thyself',
+                        userId: formData.userEmail || formData.userName || 'unknown',
+                        companyId: formData.companyId || 'unknown',
+                        timestamp: new Date().toISOString(),
+                        email: formData.userEmail || formData.userName || 'unknown',
+                        data: {
+                            userInfo: {
+                                userName: formData.userName,
+                                userEmail: formData.userEmail
+                            },
+                            dreamLauncher: {
+                                whatLove: formData.whatLove,
+                                whatGoodAt: formData.whatGoodAt,
+                                giveToWorld: formData.giveToWorld,
+                                paidFor: formData.paidFor,
+                                inspired: formData.inspired,
+                                feltBest: formData.feltBest,
+                                likeAboutSelf: formData.likeAboutSelf,
+                                hardships: formData.hardships,
+                                dream: formData.dream
+                            },
+                            strengths: {
+                                activities: formData.activities,
+                                strengths: formData.strengths,
+                                doMore: formData.doMore,
+                                doLess: formData.doLess,
+                                startTo: formData.startTo
+                            },
+                            values: {
+                                values: formData.values
+                            },
+                            growthBlueprint: {
+                                goals: formData.goals
+                            }
+                        }
+                    };
+
+                    const response = await fetch(CONFIG.EMAIL_WEBHOOK, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(emailData)
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok && (result.status === 'success' || result.success)) {
+                        alert('Your Know Thyself Canvas will be sent to your email shortly. Check your inbox!');
+                        emailBtn.disabled = false;
+                        emailBtn.textContent = 'Send to Email';
+                    } else {
+                        throw new Error(result.message || 'Failed to send email');
+                    }
+                } catch (error) {
+                    console.error('Email Send Error:', error);
+                    alert('Failed to send email. Please check your connection and try again.');
+                    if (e && e.target) {
+                        e.target.disabled = false;
+                        e.target.textContent = 'Send to Email';
+                    }
+                }
+            };
+
+            const handleSubmit = async () => {
+                try {
+                    // Prepare the payload in the format n8n expects
+                    const payload = {
+                        toolName: CONFIG.TOOL_NAME,
+                        userId: formData.userEmail || `${formData.userName.toLowerCase().replace(/\s+/g, '')}@fasttrack.com`,
+                        sprintNumber: CONFIG.SPRINT_NUMBER,
+                        timestamp: new Date().toISOString(),
+                        data: {
+                            // User Info
+                            userName: formData.userName,
+                            userEmail: formData.userEmail,
+                            
+                            // Section 1: Dream Launcher
+                            whatLove: formData.whatLove,
+                            whatGoodAt: formData.whatGoodAt,
+                            giveToWorld: formData.giveToWorld,
+                            paidFor: formData.paidFor,
+                            inspired: formData.inspired,
+                            feltBest: formData.feltBest,
+                            likeAboutSelf: formData.likeAboutSelf,
+                            hardships: formData.hardships,
+                            dream: formData.dream,
+                            
+                            // Section 2: Strengths Amplifier
+                            activities: formData.activities,
+                            strengths: formData.strengths,
+                            doMore: formData.doMore,
+                            doLess: formData.doLess,
+                            startTo: formData.startTo,
+                            
+                            // Section 3: Values Compass
+                            values: formData.values,
+                            
+                            // Section 4: Personal Growth Blueprint
+                            goals: formData.goals
+                        }
+                    };
+
+                    console.log('Submitting to n8n:', payload);
+
+                    const response = await fetch(CONFIG.SUBMIT_WEBHOOK, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+
+                    // Success
+                    alert('✅ LOCKED IN\n\nKnow Thyself complete. Self-knowledge documented and stored.\n\nReady for team meeting.');
+                    
+                } catch (error) {
+                    console.error('Submit error:', error);
+                    alert('⚠️ SUBMISSION FAILED\n\nError: ' + error.message + '\n\nYour data is still saved locally. Please try again or contact support.');
+                }
+            };
+
+            const handlePreviousSection = () => {
+                // Navigate back to section 4 (Growth Blueprint) to edit
+                if (typeof onBack === 'function') {
+                    onBack();
+                }
+            };
+
+            // Filter filled items
+            const filledActivities = formData.activities.filter(a => a.activity && a.activity.trim());
+            const filledStrengths = formData.strengths.filter(s => s.strength && s.strength.trim());
+            const filledValues = formData.values.filter(v => v.value && v.value.trim());
+            const filledGoals = formData.goals.filter(g => g.goal && g.goal.trim());
+
+            return (
+                <div className="min-h-screen bg-white">
+                    {/* Header */}
+                    <header className="no-print border-b-4 border-black p-6">
+                        <div className="max-w-6xl mx-auto flex justify-between items-center">
+                            <div>
+                                <h1 className="plaak text-4xl mb-2">YOUR KNOW THYSELF CANVAS</h1>
+                                <p className="text-gray-600">Complete self-discovery summary for {formData.userName}</p>
+                            </div>
+                            <div className="flex gap-3">
+                                <button onClick={handlePreviousSection} className="btn-secondary">
+                                    ← Previous Section
+                                </button>
+                                <button onClick={onBack} className="btn-secondary">
+                                    ← Edit
+                                </button>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Canvas */}
+                    <div className="max-w-6xl mx-auto p-12">
+                        {/* Inspirational Quote */}
+                        <div className="border-l-4 border-black pl-6 mb-8 py-2">
+                            <p className="text-2xl italic text-gray-700">
+                                "To know yourself is the beginning of all wisdom."
+                            </p>
+                            <p className="monument text-sm mt-2 text-gray-500">[ARISTOTLE]</p>
+                        </div>
+                        
+                        <div className="border-4 border-black p-8 mb-8">
+                            {/* Dream Section */}
+                            <div className="mb-12">
+                                <div className="numbered-section mb-4">[01] DREAM LAUNCHER</div>
+                                <div className="bg-green-50 border-l-4 border-green-500 p-6 mb-4">
+                                    <h3 className="plaak text-xl mb-2">MY REASON TO GET UP IN THE MORNING</h3>
+                                    <p className="text-lg">{formData.dream || 'Not specified'}</p>
+                                </div>
+                                
+                                {/* 80th Birthday Story */}
+                                {(formData.whatLove || formData.whatGoodAt || formData.giveToWorld || formData.paidFor || 
+                                  formData.inspired || formData.feltBest || formData.likeAboutSelf || formData.hardships) && (
+                                    <div className="bg-gray-50 border-2 border-black p-6">
+                                        <h3 className="plaak text-lg mb-3">80TH BIRTHDAY REFLECTIONS</h3>
+                                        <div className="space-y-2 text-sm">
+                                            {formData.whatLove && <p><strong>What I loved:</strong> {formData.whatLove}</p>}
+                                            {formData.whatGoodAt && <p><strong>What I was good at:</strong> {formData.whatGoodAt}</p>}
+                                            {formData.giveToWorld && <p><strong>What I gave to the world:</strong> {formData.giveToWorld}</p>}
+                                            {formData.paidFor && <p><strong>What I was paid for:</strong> {formData.paidFor}</p>}
+                                            {formData.inspired && <p><strong>What inspired me:</strong> {formData.inspired}</p>}
+                                            {formData.feltBest && <p><strong>When I felt my best:</strong> {formData.feltBest}</p>}
+                                            {formData.likeAboutSelf && <p><strong>What I liked about myself:</strong> {formData.likeAboutSelf}</p>}
+                                            {formData.hardships && <p><strong>Hardships I overcame:</strong> {formData.hardships}</p>}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Strengths Section */}
+                            <div className="mb-12">
+                                <div className="numbered-section mb-4">[02] STRENGTHS AMPLIFIER</div>
+                                
+                                {filledActivities.length > 0 && (
+                                    <div className="mb-6">
+                                        <h3 className="plaak text-lg mb-3">MY ACTIVITIES</h3>
+                                        <div className="space-y-2">
+                                            {filledActivities.map((act, i) => (
+                                                <div key={i} className="bg-gray-50 border-l-4 border-gray-400 p-4 flex justify-between items-center">
+                                                    <span className="font-bold">{act.activity}</span>
+                                                    <span className={`text-2xl ${act.energy === '+' ? 'text-green-600' : 'text-red-600'}`}>
+                                                        {act.energy}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {filledStrengths.length > 0 && (
+                                    <div className="mb-6">
+                                        <h3 className="plaak text-lg mb-3">MY STRENGTHS</h3>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            {filledStrengths.map((str, i) => (
+                                                <div key={i} className="border-2 border-black p-4 bg-yellow-50">
+                                                    <div className="font-bold text-lg mb-1">{str.strength}</div>
+                                                    <div className="text-sm text-gray-600">Role Alignment: {str.fitPercent}%</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6">
+                                    <h3 className="plaak text-lg mb-3">ACTION PLAN</h3>
+                                    {formData.doMore && <p className="mb-2"><strong>Do More:</strong> {formData.doMore}</p>}
+                                    {formData.doLess && <p className="mb-2"><strong>Do Less:</strong> {formData.doLess}</p>}
+                                    {formData.startTo && <p><strong>Start To:</strong> {formData.startTo}</p>}
+                                </div>
+                            </div>
+
+                            {/* Values Section */}
+                            <div className="mb-12">
+                                <div className="numbered-section mb-4">[03] VALUES COMPASS</div>
+                                {filledValues.length > 0 ? (
+                                    <div className="space-y-4">
+                                        {filledValues.map((val, i) => (
+                                            <div key={i} className="bg-blue-50 border-l-4 border-blue-500 p-6">
+                                                <h3 className="plaak text-xl mb-2">{val.value}</h3>
+                                                {val.howLive && <p className="mb-2 text-sm"><strong>How I live it:</strong> {val.howLive}</p>}
+                                                {val.alignment && <p className="text-sm"><strong>Alignment:</strong> {val.alignment}%</p>}
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-gray-500">No values specified</p>
+                                )}
+                            </div>
+
+                            {/* Growth Section */}
+                            <div>
+                                <div className="numbered-section mb-4">[04] PERSONAL GROWTH BLUEPRINT</div>
+                                {filledGoals.length > 0 ? (
+                                    <div className="space-y-4">
+                                        {filledGoals.map((goal, i) => (
+                                            <div key={i} className="bg-green-50 border-l-4 border-green-500 p-6">
+                                                <div className="font-bold text-xl mb-3">{goal.goal}</div>
+                                                {goal.action && (
+                                                    <div className="mb-2">
+                                                        <strong className="text-sm">Action:</strong>
+                                                        <p className="text-sm mt-1">{goal.action}</p>
+                                                    </div>
+                                                )}
+                                                {goal.byWhen && (
+                                                    <div className="text-sm">
+                                                        <strong>Deadline:</strong> {new Date(goal.byWhen).toLocaleDateString()}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-gray-500">No goals specified</p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex gap-4 no-print max-w-6xl mx-auto px-12 pb-12">
+                            <button onClick={handlePreviousSection} className="btn-secondary text-lg py-4 px-6">
+                                ← Previous Section
+                            </button>
+                            <button onClick={handleShare} className="btn-primary flex-1 text-lg py-4">
+                                Share With Team
+                            </button>
+                            <button onClick={handleSendEmail} className="btn-primary flex-1 text-lg py-4">
+                                Send to Email
+                            </button>
+                            <button 
+                                onClick={handleSubmit} 
+                                className="btn-primary flex-1 text-lg py-4"
+                            >
+                                Final Submit to n8n
+                            </button>
+                        </div>
+
+                        <div className="mt-6 text-center text-sm text-gray-600">
+                            <p className="monument">SELF-KNOWLEDGE LOCKED IN</p>
+                            <p className="mt-2">Bring these insights to your Guru-led team meeting</p>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Render App
+        ReactDOM.render(<KnowThyselfTool />, document.getElementById('root'));
+    </script>
+</body>
+</html>
+
