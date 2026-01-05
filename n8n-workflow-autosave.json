@@ -1,0 +1,282 @@
+{
+  "name": "Fast Track Tools - Auto-Save",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "tools/autosave",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 0],
+      "name": "Webhook - Auto-Save"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "_id",
+              "value": "={{ $json.body.toolName }}_{{ $json.body.userId }}_draft",
+              "type": "string"
+            },
+            {
+              "name": "userId",
+              "value": "={{ $json.body.userId }}",
+              "type": "string"
+            },
+            {
+              "name": "toolName",
+              "value": "={{ $json.body.toolName }}",
+              "type": "string"
+            },
+            {
+              "name": "status",
+              "value": "draft",
+              "type": "string"
+            },
+            {
+              "name": "toolData",
+              "value": "={{ $json.body.data }}",
+              "type": "object"
+            },
+            {
+              "name": "lastSaved",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "name": "version",
+              "value": "1",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [200, 0],
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.toolName }}",
+                    "rightValue": "woop",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.toolName }}",
+                    "rightValue": "know_thyself",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.toolName }}",
+                    "rightValue": "dream",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.toolName }}",
+                    "rightValue": "team",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.toolName }}",
+                    "rightValue": "market_size",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.toolName }}",
+                    "rightValue": "core_activities",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [400, 0],
+      "name": "Route by Tool"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "collection": "woop_submissions",
+        "updateKey": "_id",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "_id",
+              "fieldValue": "={{ $json._id }}"
+            },
+            {
+              "fieldId": "userId",
+              "fieldValue": "={{ $json.userId }}"
+            },
+            {
+              "fieldId": "toolName",
+              "fieldValue": "={{ $json.toolName }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "={{ $json.status }}"
+            },
+            {
+              "fieldId": "toolData",
+              "fieldValue": "={{ $json.toolData }}"
+            },
+            {
+              "fieldId": "lastSaved",
+              "fieldValue": "={{ $json.lastSaved }}"
+            }
+          ]
+        },
+        "options": {
+          "upsert": true
+        }
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [600, -300],
+      "name": "Upsert WOOP Draft"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "collection": "know_thyself_submissions",
+        "updateKey": "_id",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "_id",
+              "fieldValue": "={{ $json._id }}"
+            },
+            {
+              "fieldId": "userId",
+              "fieldValue": "={{ $json.userId }}"
+            },
+            {
+              "fieldId": "toolName",
+              "fieldValue": "={{ $json.toolName }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "={{ $json.status }}"
+            },
+            {
+              "fieldId": "toolData",
+              "fieldValue": "={{ $json.toolData }}"
+            },
+            {
+              "fieldId": "lastSaved",
+              "fieldValue": "={{ $json.lastSaved }}"
+            }
+          ]
+        },
+        "options": {
+          "upsert": true
+        }
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [600, -150],
+      "name": "Upsert Know Thyself Draft"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"status\": \"saved\", \"timestamp\": \"{{ $now.toISO() }}\" }",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [800, 0],
+      "name": "Respond Success"
+    }
+  ],
+  "connections": {
+    "Webhook - Auto-Save": {
+      "main": [[{"node": "Prepare Data", "type": "main", "index": 0}]]
+    },
+    "Prepare Data": {
+      "main": [[{"node": "Route by Tool", "type": "main", "index": 0}]]
+    },
+    "Route by Tool": {
+      "main": [
+        [{"node": "Upsert WOOP Draft", "type": "main", "index": 0}],
+        [{"node": "Upsert Know Thyself Draft", "type": "main", "index": 0}]
+      ]
+    },
+    "Upsert WOOP Draft": {
+      "main": [[{"node": "Respond Success", "type": "main", "index": 0}]]
+    },
+    "Upsert Know Thyself Draft": {
+      "main": [[{"node": "Respond Success", "type": "main", "index": 0}]]
+    }
+  }
+}
+
+
+
